@@ -81,7 +81,7 @@ jobs:
         run: |
           cd target/release
           sha256sum release-test > ../release-test-${{ matrix.target }}.sha256
-          tar czf ../release-test-${{ matrix.target }}.tar.gz otti
+          tar czf ../release-test-${{ matrix.target }}.tar.gz release-test
       - name: Upload binary
         uses: actions/upload-artifact@v2
         with:
