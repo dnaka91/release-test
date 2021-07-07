@@ -95,10 +95,10 @@ jobs:
       - run: ls -l
       - name: Create checksums
         run: |
-          cd artifacts
+          cd artifact
           sha256sum -b *.tar.gz > ../checksums.sha256
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "checksums.sha256,artifacts/*.tar.gz"
+          artifacts: "checksums.sha256,artifact/*.tar.gz"
           token: ${{ secrets.GITHUB_TOKEN }}
