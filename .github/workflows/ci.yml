@@ -84,7 +84,6 @@ jobs:
       - name: Upload binary
         uses: actions/upload-artifact@v2
         with:
-          name: binary
           path: target/*.tar.gz
   publish:
     name: Publish
@@ -93,12 +92,12 @@ jobs:
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v2
-      - name: List dirs
-        run: ls -l binary
       - name: Create checksums
-        run: sha256sum -b *.tar.gz > checksums.sha256
+        run: |
+          cd artifacts
+          sha256sum -b *.tar.gz > ../checksums.sha256
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "*.sha256,binary/*.tar.gz"
+          artifacts: "checksums.sha256,artifacts/*.tar.gz"
           token: ${{ secrets.GITHUB_TOKEN }}
