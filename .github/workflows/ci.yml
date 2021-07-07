@@ -92,6 +92,7 @@ jobs:
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v2
+      - run: ls -l
       - name: Create checksums
         run: |
           cd artifacts
