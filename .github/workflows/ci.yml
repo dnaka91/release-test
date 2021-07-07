@@ -80,7 +80,6 @@ jobs:
       - name: Create tarball
         run: |
           cd target/release
-          sha256sum release-test > ../release-test-${{ matrix.target }}.sha256
           tar czf ../release-test-${{ matrix.target }}.tar.gz release-test
       - name: Upload binary
         uses: actions/upload-artifact@v2
@@ -99,6 +98,8 @@ jobs:
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v2
+      - name: Create checksums
+        run: sha256sum -b *.tar.gz > checksums.sha256
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
