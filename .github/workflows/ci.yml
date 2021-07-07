@@ -94,11 +94,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v2
       - name: List dirs
-        run: |
-          set -x
-          ls -l
-          ls -l binary
-          ls -l release-test
+        run: ls -l binary
       - name: Create checksums
         run: sha256sum -b *.tar.gz > checksums.sha256
       - name: Create release
