@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        build: [linux, macos]
+        build: [linux, macos, windows]
         include:
           - build: linux
             os: ubuntu-latest
@@ -17,6 +17,9 @@ jobs:
           - build: macos
             os: macos-latest
             target: x86_64-apple-darwin
+          - build: windows
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -31,15 +34,25 @@ jobs:
           command: build
           args: --release --locked
       - name: Strip binary
+        if: runner.os != 'Windows'
         run: strip target/release/release-test
       - name: Create tarball
+        if: runner.os != 'Windows'
         run: |
           cd target/release
           tar czf ../release-test-${{ matrix.target }}.tar.gz release-test
+      - name: Create zip
+        if: runner.os == 'Windows'
+        run: |
+          cd target/release
+          7z a ../release-test-${{ matrix.target }}.zip release-test.exe
       - name: Upload binary
         uses: actions/upload-artifact@v2
         with:
-          path: target/*.tar.gz
+          name: artifact-${{ matrix.build }}
+          path: |
+            target/*.tar.gz
+            target/*.zip
   publish:
     name: Publish
     runs-on: ubuntu-latest
@@ -49,10 +62,12 @@ jobs:
         uses: actions/download-artifact@v2
       - name: Create checksums
         run: |
-          cd artifact
-          sha256sum -b *.tar.gz > ../checksums.sha256
+          for dir in $(pwd)/artifact-*; do
+            cd $dir
+            sha256sum -b * >> ~/checksums.sha256
+          done
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "checksums.sha256,artifact/*.tar.gz"
+          artifacts: "~/checksums.sha256,artifact-*/*"
           token: ${{ secrets.GITHUB_TOKEN }}
